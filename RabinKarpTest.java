@@ -28,8 +28,7 @@ public class RabinKarpTest {
 		RabinKarp.test("bcara", "abacadabrabracabracadabrabrabracad");
 		RabinKarp.test("rabrabracad", "abacadabrabracabracadabrabrabracad");
 		RabinKarp.test("abacad", "abacadabrabracabracadabrabrabracad");
-		
-		
+
 	}
 
 	public static long hash(String string) {
@@ -61,4 +60,5 @@ public class RabinKarpTest {
 		}
 		return res;
 	}
+
 }

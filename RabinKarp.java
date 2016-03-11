@@ -168,4 +168,5 @@ public class RabinKarp {
 			System.out.print(" ");
 		System.out.println(pat);
 	}
+
 }
