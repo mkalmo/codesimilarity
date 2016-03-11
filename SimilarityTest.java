@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SimilarityTest {
 
 	private static final int NGRAM_SIZE = 5;
 	private static final int WINDOW_SIZE = 4;
+	private static final String MULTIPLE_WHITESPACE_PATTERN = "(\\s+)|(\\t+)|(\\n+)";
 
 	private static final String PATH = "D:\\Users\\Urmas Hoogma\\workspace\\EIK\\I231_algo_andmed\\src\\com\\googlecode\\ounit\\codesimilarity\\testcode\\";
 
@@ -32,26 +35,33 @@ public class SimilarityTest {
 
 		try {
 			/* Test1.txt - original */
-			String simpleSource1 = new String(Files.readAllBytes(Paths.get(PATH
-					+ "Test1.txt")));
+			String simpleSource1 = replaceMultipleWhitespace(new String(
+					Files.readAllBytes(Paths.get(PATH + "Test1.txt"))));
 
 			/*
 			 * Test2.txt - simple plagiarism - variable names changed,otherwise
-			 * identical to Test1
+			 * identical to Test1.txt
 			 */
-			String simpleSource2 = new String(Files.readAllBytes(Paths.get(PATH
-					+ "Test2.txt")));
+			String simpleSource2 = replaceMultipleWhitespace(new String(
+					Files.readAllBytes(Paths.get(PATH + "Test2.txt"))));
 
 			/*
 			 * Test3.txt - for-loops refactored into while-loops, otherwise
-			 * identical to Test1
+			 * identical to Test1.txt
 			 */
-			String simpleSource3 = new String(Files.readAllBytes(Paths.get(PATH
-					+ "Test3.txt")));
+			String simpleSource3 = replaceMultipleWhitespace(new String(
+					Files.readAllBytes(Paths.get(PATH + "Test3.txt"))));
 
 			/* Test4.txt - code that is completely different from other three */
-			String simpleSource4 = new String(Files.readAllBytes(Paths.get(PATH
-					+ "Test4.txt")));
+			String simpleSource4 = replaceMultipleWhitespace(new String(
+					Files.readAllBytes(Paths.get(PATH + "Test4.txt"))));
+
+			System.out.println("");
+			System.out.println("Printing testdata:");
+			System.out.println("First:  " + simpleSource1);
+			System.out.println("Second: " + simpleSource2);
+			System.out.println("Third:  " + simpleSource3);
+			System.out.println("Fourth: " + simpleSource4);
 
 			System.out.println("");
 			double jccSimple1 = Similarity.JaccardCoefficient(simpleSource1,
@@ -65,9 +75,8 @@ public class SimilarityTest {
 							+ " First and third: lower similarity because of refactoring loops");
 			double jccSimple3 = Similarity.JaccardCoefficient(simpleSource2,
 					simpleSource3, NGRAM_SIZE, WINDOW_SIZE);
-			System.out
-					.println(jccSimple3
-							+ " Second and third: identical result to comparison of 1 and 3 -> Fluke?");
+			System.out.println(jccSimple3
+					+ " Second and third: highest similarity");
 			System.out.println("");
 
 			double jccControl1 = Similarity.JaccardCoefficient(simpleSource1,
@@ -83,6 +92,16 @@ public class SimilarityTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		replaceMultipleWhitespace("\t\tsisu\n\n teine sisu");
+
+	}
+
+	private static String replaceMultipleWhitespace(String input) {
+		Pattern whitespace = Pattern.compile(MULTIPLE_WHITESPACE_PATTERN);
+		Matcher matcher = whitespace.matcher(input);
+		String result = matcher.replaceAll(" ");
+		return result;
 	}
 
 }
