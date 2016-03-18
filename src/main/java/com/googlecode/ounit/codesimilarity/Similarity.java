@@ -1,5 +1,7 @@
 package com.googlecode.ounit.codesimilarity;
-
+/**
+ * @author Urmas Hoogma
+ */
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,16 +73,25 @@ public class Similarity {
 	 * 
 	 * @return https://en.wikipedia.org/wiki/Jaccard_index
 	 * */
-	public static double JaccardCoefficient(String a, String b, int ngramSize,
-			int windowSize) {
-		List<Integer> suit1 = generateAllHashes(a, ngramSize);
-		List<Integer> suit2 = generateAllHashes(b, ngramSize);
+	public static double JaccardCoefficient(String first, String second, String boilerPlate,
+			int ngramSize, int windowSize) {
+		List<Integer> hashes1 = generateAllHashes(first, ngramSize);
+		List<Integer> hashes2 = generateAllHashes(second, ngramSize);
+		List<Integer> hashesBoilerPlate;
+		
+		if (boilerPlate == null) {
+			hashesBoilerPlate = new ArrayList<Integer>();
+		} else {
+			hashesBoilerPlate = generateAllHashes(boilerPlate, ngramSize);
+		}
 
-		int[] converted1 = suit1.stream().mapToInt(i -> i).toArray();
-		int[] converted2 = suit2.stream().mapToInt(i -> i).toArray();
+		int[] convertedHashes1 = removeBoilerplate(hashes1, hashesBoilerPlate).stream()
+				.mapToInt(i -> i).toArray();
+		int[] convertedHashes2 = removeBoilerplate(hashes2, hashesBoilerPlate).stream()
+				.mapToInt(i -> i).toArray();
 
-		Winnowing win1 = new Winnowing(converted1, windowSize);
-		Winnowing win2 = new Winnowing(converted2, windowSize);
+		Winnowing win1 = new Winnowing(convertedHashes1, windowSize);
+		Winnowing win2 = new Winnowing(convertedHashes2, windowSize);
 
 		Map<Integer, Integer> map1 = win1.winnow();
 		Map<Integer, Integer> map2 = win2.winnow();
@@ -93,6 +104,12 @@ public class Similarity {
 				.collect(Collectors.toSet());
 
 		return calculateJaccardCoefficient(set1, set2, commonSet);
+	}
+
+	public static List<Integer> removeBoilerplate(List<Integer> submission,
+			List<Integer> boilerPlate) {
+		submission.removeAll(boilerPlate);
+		return submission;
 	}
 
 	private static double calculateJaccardCoefficient(Collection<Integer> set1,
@@ -109,4 +126,3 @@ public class Similarity {
 	}
 
 }
-

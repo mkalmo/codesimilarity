@@ -1,5 +1,7 @@
 package com.googlecode.ounit.codesimilarity;
-
+/**
+ * @author Urmas Hoogma
+ */
 import java.util.HashMap;
 import java.util.Map;
 

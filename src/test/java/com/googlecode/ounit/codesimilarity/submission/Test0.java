@@ -1,4 +1,4 @@
-package com.googlecode.ounit.codesimilarity.testcode;
+package com.googlecode.ounit.codesimilarity.submission;
 
 import java.util.ArrayList.*;
 import java.util.ArrayList;

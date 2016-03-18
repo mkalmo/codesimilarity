@@ -7,7 +7,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+/**
+ * @author Urmas Hoogma
+ * */
 public class SimilarityTest {
 
 	private static final int NGRAM_SIZE = 5;
@@ -31,13 +33,13 @@ public class SimilarityTest {
 		System.out.println("similar " + Similarity.similarHashes(suit2, suit3));
 		System.out.println("similar " + Similarity.similarHashes(suit3, suit1));
 
-		double jcc = Similarity.JaccardCoefficient(a, b, NGRAM_SIZE,
+		double jcc = Similarity.JaccardCoefficient(a, b, null, NGRAM_SIZE,
 				WINDOW_SIZE);
 		System.out.println(jcc);
 
 		try {
 			/* Test1.txt - original */
-			String simpleSource0 = replaceMultipleWhitespace(new String(
+			String simpleSource0 = replaceMultipleWhiteSpace(new String(
 					Files.readAllBytes(Paths.get(PATH + FS + "students" + FS
 							+ "0" + FS + "Test.txt"))));
 
@@ -45,20 +47,23 @@ public class SimilarityTest {
 			 * Test2.txt - simple plagiarism - variable names changed,otherwise
 			 * identical to Test1.txt
 			 */
-			String simpleSource1 = replaceMultipleWhitespace(new String(
+			String simpleSource1 = replaceMultipleWhiteSpace(new String(
 					Files.readAllBytes(Paths.get(PATH + FS + "students" + FS
 							+ "1" + FS + "Test.txt"))));
 			/*
 			 * Test3.txt - for-loops refactored into while-loops, otherwise
 			 * identical to Test1.txt
 			 */
-			String simpleSource2 = replaceMultipleWhitespace(new String(
+			String simpleSource2 = replaceMultipleWhiteSpace(new String(
 					Files.readAllBytes(Paths.get(PATH + FS + "students" + FS
 							+ "2" + FS + "Test.txt"))));
 			/* Test4.txt - code that is completely different from other three */
-			String simpleSource3 = replaceMultipleWhitespace(new String(
+			String simpleSource3 = replaceMultipleWhiteSpace(new String(
 					Files.readAllBytes(Paths.get(PATH + FS + "students" + FS
 							+ "3" + FS + "Test.txt"))));
+			String boilerplate = replaceMultipleWhiteSpace(new String(
+					Files.readAllBytes(Paths.get(PATH + FS + "teacher" + FS
+							 + "Test.txt"))));
 			System.out.println("");
 			System.out.println("Printing testdata:");
 			System.out.println("First:  " + simpleSource0);
@@ -68,39 +73,36 @@ public class SimilarityTest {
 
 			System.out.println("");
 			double jccSimple1 = Similarity.JaccardCoefficient(simpleSource0,
-					simpleSource1, NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource1, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccSimple1
 					+ " First and second: high similarity");
 			double jccSimple2 = Similarity.JaccardCoefficient(simpleSource0,
-					simpleSource2, NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource2, boilerplate,  NGRAM_SIZE, WINDOW_SIZE);
 			System.out
 					.println(jccSimple2
 							+ " First and third: lower similarity because of refactoring loops");
 			double jccSimple3 = Similarity.JaccardCoefficient(simpleSource1,
-					simpleSource2, NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource2, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccSimple3
 					+ " Second and third: highest similarity");
 			System.out.println("");
 
 			double jccControl1 = Similarity.JaccardCoefficient(simpleSource0,
-					simpleSource3, NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource3, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccControl1 + " First and fourth");
 			double jccControl2 = Similarity.JaccardCoefficient(simpleSource1,
-					simpleSource3, NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource3, boilerplate,  NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccControl2 + " Second and fourth");
 			double jccControl3 = Similarity.JaccardCoefficient(simpleSource2,
-					simpleSource3, NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource3, boilerplate,  NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccControl3 + " Third and fourth");
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		replaceMultipleWhitespace("\t\tsisu\n\n teine sisu");
-
 	}
 
-	private static String replaceMultipleWhitespace(String input) {
+	public static String replaceMultipleWhiteSpace(String input) {
 		Pattern whitespace = Pattern.compile(MULTIPLE_WHITESPACE_PATTERN);
 		Matcher matcher = whitespace.matcher(input);
 		String result = matcher.replaceAll(" ");
