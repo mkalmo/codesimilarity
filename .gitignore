@@ -1,5 +1,2 @@
 # Target Directory #
-target/
-
-# Compiled Files #
-*.class
+*/target/**
