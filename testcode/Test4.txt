@@ -1,9 +1,0 @@
-public static void main(String[] args)
-{
-	System.out.println("");
-	for (;;) 
-	{
-		System.out.println(i);
-	}
-	System.out.println(sum);
-}
