@@ -1,4 +1,5 @@
 package com.googlecode.ounit.codesimilarity;
+
 /**
  * @author Urmas Hoogma
  */
@@ -7,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Similarity {
@@ -73,23 +73,25 @@ public class Similarity {
 	 * 
 	 * @return https://en.wikipedia.org/wiki/Jaccard_index
 	 * */
-	public static double JaccardCoefficient(String first, String second, String boilerPlate,
-			int ngramSize, int windowSize) {
+	public static double JaccardCoefficient(String first, String second,
+			String boilerPlate, int ngramSize, int windowSize) {
 		List<Integer> hashes1 = generateAllHashes(first, ngramSize);
 		List<Integer> hashes2 = generateAllHashes(second, ngramSize);
 		List<Integer> hashesBoilerPlate;
+		int[] convertedHashes1;
+		int[] convertedHashes2;
 		
 		if (boilerPlate == null) {
-			hashesBoilerPlate = new ArrayList<Integer>();
+			convertedHashes1 =hashes1.stream().mapToInt(i -> i).toArray();
+			convertedHashes2 = hashes2.stream().mapToInt(i -> i).toArray();
 		} else {
 			hashesBoilerPlate = generateAllHashes(boilerPlate, ngramSize);
+			convertedHashes1 = removeBoilerplate(hashes1, hashesBoilerPlate)
+					.stream().mapToInt(i -> i).toArray();
+			convertedHashes2 = removeBoilerplate(hashes2, hashesBoilerPlate)
+					.stream().mapToInt(i -> i).toArray();
 		}
-
-		int[] convertedHashes1 = removeBoilerplate(hashes1, hashesBoilerPlate).stream()
-				.mapToInt(i -> i).toArray();
-		int[] convertedHashes2 = removeBoilerplate(hashes2, hashesBoilerPlate).stream()
-				.mapToInt(i -> i).toArray();
-
+		
 		Winnowing win1 = new Winnowing(convertedHashes1, windowSize);
 		Winnowing win2 = new Winnowing(convertedHashes2, windowSize);
 
@@ -98,10 +100,9 @@ public class Similarity {
 
 		Collection<Integer> set1 = map1.values();
 		Collection<Integer> set2 = map2.values();
-
-		Set<Integer> commonSet = set1.stream()
+		Collection<Integer> commonSet = set1.stream()
 				.filter(item -> set2.contains(item))
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 
 		return calculateJaccardCoefficient(set1, set2, commonSet);
 	}
@@ -113,7 +114,7 @@ public class Similarity {
 	}
 
 	private static double calculateJaccardCoefficient(Collection<Integer> set1,
-			Collection<Integer> set2, Set<Integer> commonSet) {
+			Collection<Integer> set2, Collection<Integer> commonSet) {
 		double cs = commonSet.size();
 		double shortest;
 		if (set1.size() > set2.size()) {

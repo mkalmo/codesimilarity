@@ -21,7 +21,7 @@ public class Winnowing {
 		for (int i = 0; i < hashList.length - windowSize + 1; i++) {
 			// select the minimal hash within the window
 			int[] min = min(makeWindow(i, windowSize));
-			// put the minimla hash into Map (duplicates are overwritten)
+			// put the minimal hash into Map (duplicates are overwritten)
 			map.put(min[0] + i, min[1]);
 		}
 		// System.out.println(map);

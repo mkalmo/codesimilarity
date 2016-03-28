@@ -7,20 +7,34 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 /**
  * @author Urmas Hoogma
  * */
 public class SimilarityTest {
 
-	private static final int NGRAM_SIZE = 5;
-	private static final int WINDOW_SIZE = 4;
+	private static final int NGRAM_SIZE = 12; // 5;
+	private static final int WINDOW_SIZE = 8; // 4;
 	private static final String MULTIPLE_WHITESPACE_PATTERN = "(\\s+)|(\\t+)|(\\n+)";
 	private static final String FS = File.separator;
 
 	private static final String PATH = "D:\\Users\\Urmas Hoogma\\workspace\\codesimilarity\\src\\test\\java\\com\\googlecode\\ounit\\codesimilarity\\assignment";
+	private static final String PATHQ = "D:\\Users\\Urmas Hoogma\\workspace\\codesimilarity\\src\\test\\java\\com\\googlecode\\ounit\\codesimilarity\\quaternion";
 
 	public static void main(String[] args) {
+		// stringsTest();
+		// simpleTest();
+		quaternionTest();
+	}
 
+	public static String replaceMultipleWhiteSpace(String input) {
+		Pattern whitespace = Pattern.compile(MULTIPLE_WHITESPACE_PATTERN);
+		Matcher matcher = whitespace.matcher(input);
+		String result = matcher.replaceAll(" ");
+		return result;
+	}
+
+	public static void stringsTest() {
 		String a = "adorunrunrunadorunrun";
 		String b = "adorunrungetadorunrun";
 		String c = "lhg�hgfghdfghdfgdf�hg";
@@ -29,14 +43,17 @@ public class SimilarityTest {
 		List<Integer> suit2 = Similarity.generateAllHashes(b, NGRAM_SIZE);
 		List<Integer> suit3 = Similarity.generateAllHashes(c, NGRAM_SIZE);
 
+		System.out.println("similar " + Similarity.similarHashes(suit1, suit1));
 		System.out.println("similar " + Similarity.similarHashes(suit1, suit2));
 		System.out.println("similar " + Similarity.similarHashes(suit2, suit3));
 		System.out.println("similar " + Similarity.similarHashes(suit3, suit1));
 
-		double jcc = Similarity.JaccardCoefficient(a, b, null, NGRAM_SIZE,
+		double jcc = Similarity.JaccardCoefficient(a, a, null, NGRAM_SIZE,
 				WINDOW_SIZE);
 		System.out.println(jcc);
+	}
 
+	public static void simpleTest() {
 		try {
 			/* Test1.txt - original */
 			String simpleSource0 = replaceMultipleWhiteSpace(new String(
@@ -63,7 +80,7 @@ public class SimilarityTest {
 							+ "3" + FS + "Test.txt"))));
 			String boilerplate = replaceMultipleWhiteSpace(new String(
 					Files.readAllBytes(Paths.get(PATH + FS + "teacher" + FS
-							 + "Test.txt"))));
+							+ "Test.txt"))));
 			System.out.println("");
 			System.out.println("Printing testdata:");
 			System.out.println("First:  " + simpleSource0);
@@ -77,7 +94,7 @@ public class SimilarityTest {
 			System.out.println(jccSimple1
 					+ " First and second: high similarity");
 			double jccSimple2 = Similarity.JaccardCoefficient(simpleSource0,
-					simpleSource2, boilerplate,  NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource2, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out
 					.println(jccSimple2
 							+ " First and third: lower similarity because of refactoring loops");
@@ -91,10 +108,10 @@ public class SimilarityTest {
 					simpleSource3, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccControl1 + " First and fourth");
 			double jccControl2 = Similarity.JaccardCoefficient(simpleSource1,
-					simpleSource3, boilerplate,  NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource3, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccControl2 + " Second and fourth");
 			double jccControl3 = Similarity.JaccardCoefficient(simpleSource2,
-					simpleSource3, boilerplate,  NGRAM_SIZE, WINDOW_SIZE);
+					simpleSource3, boilerplate, NGRAM_SIZE, WINDOW_SIZE);
 			System.out.println(jccControl3 + " Third and fourth");
 
 		} catch (IOException e) {
@@ -102,11 +119,28 @@ public class SimilarityTest {
 		}
 	}
 
-	public static String replaceMultipleWhiteSpace(String input) {
-		Pattern whitespace = Pattern.compile(MULTIPLE_WHITESPACE_PATTERN);
-		Matcher matcher = whitespace.matcher(input);
-		String result = matcher.replaceAll(" ");
-		return result;
-	}
+	public static void quaternionTest() {
+		try {
+			String q0 = new String(Files.readAllBytes(Paths.get(PATHQ + FS
+					+ "students" + FS + "0" + FS + "Test.txt")));
 
+			String q1 = new String(Files.readAllBytes(Paths.get(PATHQ + FS
+					+ "students" + FS + "1" + FS + "Test.txt")));
+
+			String qBoilerplate = new String(Files.readAllBytes(Paths.get(PATHQ
+					+ FS + "teacher" + FS + "Test.txt")));
+
+			double qTest1 = Similarity.JaccardCoefficient(q0, q1, qBoilerplate,
+					NGRAM_SIZE, WINDOW_SIZE);
+			System.out.println(qTest1 + " Quaternion");
+			/*
+			 * List<Integer> q0l = Similarity.generateAllHashes(q0, NGRAM_SIZE);
+			 * List<Integer> q1l = Similarity.generateAllHashes(q1, NGRAM_SIZE);
+			 * System.out.println("similar " + Similarity.similarHashes(q0l,
+			 * q1l));
+			 */
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
