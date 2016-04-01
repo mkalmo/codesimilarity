@@ -1,10 +1,11 @@
 package com.googlecode.ounit.codesimilarity;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,18 +14,43 @@ import java.util.regex.Pattern;
  * */
 public class SimilarityTest {
 
-	private static final int NGRAM_SIZE = 12; // 5;
-	private static final int WINDOW_SIZE = 8; // 4;
+	private static final int NGRAM_SIZE = 12;
+	private static final int WINDOW_SIZE = 8;
 	private static final String MULTIPLE_WHITESPACE_PATTERN = "(\\s+)|(\\t+)|(\\n+)";
-	private static final String FS = File.separator;
+	private static final String FS = System.getProperty("file.separator");
 
 	private static final String PATH = "D:\\Users\\Urmas Hoogma\\workspace\\codesimilarity\\src\\test\\java\\com\\googlecode\\ounit\\codesimilarity\\assignment";
 	private static final String PATHQ = "D:\\Users\\Urmas Hoogma\\workspace\\codesimilarity\\src\\test\\java\\com\\googlecode\\ounit\\codesimilarity\\quaternion";
+	private static final String PATH_REAL_DATA = "C:\\Users\\Urmas Hoogma\\Desktop\\treenode-res";
+
+	static Map<Pair, Double> comparisonResults = new HashMap<Pair, Double>();
 
 	public static void main(String[] args) {
-		// stringsTest();
-		// simpleTest();
-		quaternionTest();
+		// bulkTest();
+		
+		SimilarityRunner sim = new SimilarityRunner("TreeNode.java", 10,
+				21);
+		sim.test(PATH_REAL_DATA + FS);
+		System.out.println(sim.difference);
+		
+		SimilarityRunner sim2 = new SimilarityRunner("TreeNode.java", 5,
+				26);
+		sim2.test(PATH_REAL_DATA + FS);
+		System.out.println(sim2.difference);
+	}
+
+	private static void bulkTest() {
+		for (int k = 1; k <= 50; k++) {
+			for (int t = 1 + k; t <= k + 30; t++) {
+				int w = t - k + 1;
+				SimilarityRunner sim2 = new SimilarityRunner("TreeNode.java", k,
+						w);
+				sim2.test(PATH_REAL_DATA + FS);
+				comparisonResults.put(new Pair(k, t), sim2.difference);
+			}
+		}
+		comparisonResults = MapUtil.sortByValue(comparisonResults);
+		System.out.println(comparisonResults.toString());
 	}
 
 	public static String replaceMultipleWhiteSpace(String input) {

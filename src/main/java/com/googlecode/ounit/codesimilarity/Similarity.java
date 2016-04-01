@@ -80,9 +80,9 @@ public class Similarity {
 		List<Integer> hashesBoilerPlate;
 		int[] convertedHashes1;
 		int[] convertedHashes2;
-		
+
 		if (boilerPlate == null) {
-			convertedHashes1 =hashes1.stream().mapToInt(i -> i).toArray();
+			convertedHashes1 = hashes1.stream().mapToInt(i -> i).toArray();
 			convertedHashes2 = hashes2.stream().mapToInt(i -> i).toArray();
 		} else {
 			hashesBoilerPlate = generateAllHashes(boilerPlate, ngramSize);
@@ -91,7 +91,7 @@ public class Similarity {
 			convertedHashes2 = removeBoilerplate(hashes2, hashesBoilerPlate)
 					.stream().mapToInt(i -> i).toArray();
 		}
-		
+
 		Winnowing win1 = new Winnowing(convertedHashes1, windowSize);
 		Winnowing win2 = new Winnowing(convertedHashes2, windowSize);
 
@@ -113,16 +113,27 @@ public class Similarity {
 		return submission;
 	}
 
+	public static double JaccardCoefficientFromHashes(int[] convertedHashesFirst,
+			int[] convertedHashesSecond, int windowSize) {
+		Winnowing win1 = new Winnowing(convertedHashesFirst, windowSize);
+		Winnowing win2 = new Winnowing(convertedHashesSecond, windowSize);
+
+		Map<Integer, Integer> map1 = win1.winnow();
+		Map<Integer, Integer> map2 = win2.winnow();
+
+		Collection<Integer> first = map1.values();
+		Collection<Integer> second = map2.values();
+		Collection<Integer> commonSet = first.stream()
+				.filter(item -> second.contains(item))
+				.collect(Collectors.toList());
+
+		return calculateJaccardCoefficient(first, second, commonSet);
+	}
+	
 	private static double calculateJaccardCoefficient(Collection<Integer> set1,
 			Collection<Integer> set2, Collection<Integer> commonSet) {
 		double cs = commonSet.size();
-		double shortest;
-		if (set1.size() > set2.size()) {
-			shortest = set2.size();
-		} else {
-			shortest = set1.size();
-		}
-		double different = shortest - cs;
+		double different = set1.size() - cs;
 		return cs / different;
 	}
 
