@@ -1,6 +1,8 @@
 package com.googlecode.ounit.codesimilarity;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -22,29 +24,40 @@ public class SimilarityTest {
 	private static final String PATH = "D:\\Users\\Urmas Hoogma\\workspace\\codesimilarity\\src\\test\\java\\com\\googlecode\\ounit\\codesimilarity\\assignment";
 	private static final String PATHQ = "D:\\Users\\Urmas Hoogma\\workspace\\codesimilarity\\src\\test\\java\\com\\googlecode\\ounit\\codesimilarity\\quaternion";
 	private static final String PATH_REAL_DATA = "C:\\Users\\Urmas Hoogma\\Desktop\\treenode-res";
+	private static final String PATH_REAL_DATA_2 = "C:\\Users\\Urmas Hoogma\\Desktop\\treenode-2-res";
 
 	static Map<Pair, Double> comparisonResults = new HashMap<Pair, Double>();
 
 	public static void main(String[] args) {
 		// bulkTest();
-		
-		SimilarityRunner sim = new SimilarityRunner("TreeNode.java", 10,
-				21);
-		sim.test(PATH_REAL_DATA + FS);
-		System.out.println(sim.difference);
-		
-		SimilarityRunner sim2 = new SimilarityRunner("TreeNode.java", 5,
-				26);
-		sim2.test(PATH_REAL_DATA + FS);
-		System.out.println(sim2.difference);
+		/*
+		 * SimilarityRunner sim = new SimilarityRunner("TreeNode.java", 10, 21);
+		 * sim.test(PATH_REAL_DATA + FS); System.out.println(sim.difference);
+		 * 
+		 * SimilarityRunner sim2 = new SimilarityRunner("TreeNode.java", 5, 26);
+		 * sim2.test(PATH_REAL_DATA + FS); System.out.println(sim2.difference);
+		 */
+		// Get current time
+		long start = System.currentTimeMillis();
+		SimilarityRunner2 sim = new SimilarityRunner2("TreeNode.java", 5, 26,
+				0.0);
+		String csvResult = sim.test(PATH_REAL_DATA_2 + FS);
+		try (PrintWriter out = new PrintWriter(
+				"C:\\Users\\Urmas Hoogma\\Desktop\\result.csv")) {
+			out.println(csvResult);
+			long elapsedTimeMillis = System.currentTimeMillis() - start;
+			System.out.println("SimilarityRunner2 runtime: "+elapsedTimeMillis / 1000F+" sec");
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private static void bulkTest() {
 		for (int k = 1; k <= 50; k++) {
 			for (int t = 1 + k; t <= k + 30; t++) {
 				int w = t - k + 1;
-				SimilarityRunner sim2 = new SimilarityRunner("TreeNode.java", k,
-						w);
+				SimilarityRunner sim2 = new SimilarityRunner("TreeNode.java",
+						k, w);
 				sim2.test(PATH_REAL_DATA + FS);
 				comparisonResults.put(new Pair(k, t), sim2.difference);
 			}
