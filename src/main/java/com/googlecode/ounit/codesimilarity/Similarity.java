@@ -5,7 +5,6 @@ package com.googlecode.ounit.codesimilarity;
  */
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,29 +19,26 @@ public class Similarity {
 	}
 
 	/**
-	 * Returns only subset of hashes
+	 * If modulus is 1 returns all hashes otherwise returns only those hashes
+	 * which are divisible by modulus
 	 * */
 	public static List<Integer> generateHashes(String input, int ngramSize,
-			int hashCount) {
-		return minimalHashes(generateHashes(generateNGrams(input, ngramSize)),
-				hashCount);
+			int modulus) {
+		return moduloHashes(generateHashes(generateNGrams(input, ngramSize)),
+				modulus);
 	}
 
 	/**
-	 * Returns all hashes
+	 * Select small subset of all hashes, in this case divisible by modulus
 	 * */
-	public static List<Integer> generateAllHashes(String input, int ngramSize) {
-		return generateHashes(generateNGrams(input, ngramSize));
-	}
-
-	/**
-	 * Select small subset of all hashes, in this case smallest
-	 * */
-	private static List<Integer> minimalHashes(List<Integer> generateHashes,
-			int hashCount) {
-		Collections.sort(generateHashes);// custom method
-		return generateHashes.stream().limit(hashCount)
-				.collect(Collectors.toList());
+	private static List<Integer> moduloHashes(List<Integer> generateHashes,
+			int modulus) {
+		if (modulus == 1) {
+			return generateHashes;
+		} else {
+			return generateHashes.stream().filter(h -> h % modulus == 0)
+					.collect(Collectors.toList());
+		}
 	}
 
 	/**
@@ -74,10 +70,11 @@ public class Similarity {
 	 * @return https://en.wikipedia.org/wiki/Jaccard_index
 	 * */
 	public static double JaccardCoefficient(String first, String second,
-			String boilerPlate, int ngramSize, int windowSize) {
-		List<Integer> hashes1 = generateAllHashes(first, ngramSize);
-		List<Integer> hashes2 = generateAllHashes(second, ngramSize);
+			String boilerPlate, int ngramSize, int windowSize, int modulus) {
+		List<Integer> hashes1 = generateHashes(first, ngramSize, modulus);
+		List<Integer> hashes2 = generateHashes(second, ngramSize, modulus);
 		List<Integer> hashesBoilerPlate;
+
 		int[] convertedHashes1;
 		int[] convertedHashes2;
 
@@ -85,7 +82,7 @@ public class Similarity {
 			convertedHashes1 = hashes1.stream().mapToInt(i -> i).toArray();
 			convertedHashes2 = hashes2.stream().mapToInt(i -> i).toArray();
 		} else {
-			hashesBoilerPlate = generateAllHashes(boilerPlate, ngramSize);
+			hashesBoilerPlate = generateHashes(boilerPlate, ngramSize, modulus);
 			convertedHashes1 = removeBoilerplate(hashes1, hashesBoilerPlate)
 					.stream().mapToInt(i -> i).toArray();
 			convertedHashes2 = removeBoilerplate(hashes2, hashesBoilerPlate)
@@ -98,43 +95,44 @@ public class Similarity {
 		Map<Integer, Integer> map1 = win1.winnow();
 		Map<Integer, Integer> map2 = win2.winnow();
 
-		Collection<Integer> set1 = map1.values();
-		Collection<Integer> set2 = map2.values();
-		Collection<Integer> commonSet = set1.stream()
-				.filter(item -> set2.contains(item))
+		Collection<Integer> collection1 = map1.values();
+		Collection<Integer> collection2 = map2.values();
+		Collection<Integer> commonCollection = collection1.stream()
+				.filter(item -> collection2.contains(item))
 				.collect(Collectors.toList());
 
-		return calculateJaccardCoefficient(set1, set2, commonSet);
+		return calculateJaccardCoefficient(collection1, collection2, commonCollection);
 	}
 
-	public static List<Integer> removeBoilerplate(List<Integer> submission,
-			List<Integer> boilerPlate) {
-		submission.removeAll(boilerPlate);
-		return submission;
+	public static List<Integer> removeBoilerplate(List<Integer> submissionHashes,
+			List<Integer> boilerPlateHashes) {
+		submissionHashes.removeAll(boilerPlateHashes);
+		return submissionHashes;
 	}
 
-	public static double JaccardCoefficientFromHashes(int[] convertedHashesFirst,
-			int[] convertedHashesSecond, int windowSize) {
+	public static double JaccardCoefficientFromHashes(
+			int[] convertedHashesFirst, int[] convertedHashesSecond,
+			int windowSize) {
 		Winnowing win1 = new Winnowing(convertedHashesFirst, windowSize);
 		Winnowing win2 = new Winnowing(convertedHashesSecond, windowSize);
 
 		Map<Integer, Integer> map1 = win1.winnow();
 		Map<Integer, Integer> map2 = win2.winnow();
 
-		Collection<Integer> first = map1.values();
-		Collection<Integer> second = map2.values();
-		Collection<Integer> commonSet = first.stream()
-				.filter(item -> second.contains(item))
+		Collection<Integer> collection1 = map1.values();
+		Collection<Integer> collection2 = map2.values();
+		Collection<Integer> commonCollection = collection1.stream()
+				.filter(item -> collection2.contains(item))
 				.collect(Collectors.toList());
 
-		return calculateJaccardCoefficient(first, second, commonSet);
+		return calculateJaccardCoefficient(collection1, collection2, commonCollection);
 	}
-	
-	private static double calculateJaccardCoefficient(Collection<Integer> set1,
-			Collection<Integer> set2, Collection<Integer> commonSet) {
-		double cs = commonSet.size();
-		double different = set1.size() - cs;
-		return cs / different;
+
+	private static double calculateJaccardCoefficient(Collection<Integer> collection1,
+			Collection<Integer> collection2, Collection<Integer> commonCollection) {
+		double common = commonCollection.size();
+		double different = collection1.size() - common;
+		return (common == 0) ? 0.0 : common / different;
 	}
 
 }

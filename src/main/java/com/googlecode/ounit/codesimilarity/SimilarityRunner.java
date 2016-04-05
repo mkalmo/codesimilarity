@@ -18,6 +18,7 @@ public class SimilarityRunner {
 	private final String STUDENTS = "students";
 	private final String TEACHER = "teacher";
 	private String FILE_NAME;
+	private int modulus;
 
 	private Map<Pair, Double> comparisonResults = new HashMap<Pair, Double>();
 	private Map<Integer, String> studentSubmissions = new HashMap<Integer, String>();
@@ -27,10 +28,11 @@ public class SimilarityRunner {
 
 	public double difference;
 	
-	public SimilarityRunner(String filename, int ngramsize, int windowsize) {
+	public SimilarityRunner(String filename, int ngramsize, int windowsize, int modulus) {
 		FILE_NAME = filename;
 		NGRAM_SIZE = ngramsize;
 		WINDOW_SIZE = windowsize;
+		this.modulus = modulus;
 	}
 
 	private List<Integer> generateBoilerPlateHashes(String path) {
@@ -41,7 +43,7 @@ public class SimilarityRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return Similarity.generateAllHashes(boilerplate, NGRAM_SIZE);
+		return Similarity.generateHashes(boilerplate, NGRAM_SIZE, modulus);
 	}
 
 	public void test(String path) {
@@ -114,8 +116,8 @@ public class SimilarityRunner {
 
 	private void generateHashes(Integer[] studentIds) {
 		for (int i = 0; i < studentIds.length; i++) {
-			List<Integer> hashes = Similarity.generateAllHashes(
-					studentSubmissions.get(studentIds[i]), NGRAM_SIZE);
+			List<Integer> hashes = Similarity.generateHashes(
+					studentSubmissions.get(studentIds[i]), NGRAM_SIZE, modulus);
 			studentHashes.put(studentIds[i], hashes);
 		}
 	}
