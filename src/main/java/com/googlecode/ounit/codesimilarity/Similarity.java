@@ -57,11 +57,15 @@ public class Similarity {
 	 * */
 	public static String[] generateNGrams(String input, int ngramSize) {
 		int size = input.length() - ngramSize + 1;
-		String[] res = new String[size];
-		for (int i = 0; i < size; i++) {
-			res[i] = input.substring(i, i + ngramSize);// implement byte shift ?
+		if (size > 0) {
+			String[] res = new String[size];
+			for (int i = 0; i < size; i++) {
+				res[i] = input.substring(i, i + ngramSize);
+				// implement byte shift ?
+			}
+			return res;
 		}
-		return res;
+		return new String[0];
 	}
 
 	/**
@@ -101,11 +105,12 @@ public class Similarity {
 				.filter(item -> collection2.contains(item))
 				.collect(Collectors.toList());
 
-		return calculateJaccardCoefficient(collection1, collection2, commonCollection);
+		return calculateJaccardCoefficient(collection1, collection2,
+				commonCollection);
 	}
 
-	public static List<Integer> removeBoilerplate(List<Integer> submissionHashes,
-			List<Integer> boilerPlateHashes) {
+	public static List<Integer> removeBoilerplate(
+			List<Integer> submissionHashes, List<Integer> boilerPlateHashes) {
 		submissionHashes.removeAll(boilerPlateHashes);
 		return submissionHashes;
 	}
@@ -125,11 +130,13 @@ public class Similarity {
 				.filter(item -> collection2.contains(item))
 				.collect(Collectors.toList());
 
-		return calculateJaccardCoefficient(collection1, collection2, commonCollection);
+		return calculateJaccardCoefficient(collection1, collection2,
+				commonCollection);
 	}
 
-	private static double calculateJaccardCoefficient(Collection<Integer> collection1,
-			Collection<Integer> collection2, Collection<Integer> commonCollection) {
+	private static double calculateJaccardCoefficient(
+			Collection<Integer> collection1, Collection<Integer> collection2,
+			Collection<Integer> commonCollection) {
 		double common = commonCollection.size();
 		double different = collection1.size() - common;
 		return (common == 0) ? 0.0 : common / different;

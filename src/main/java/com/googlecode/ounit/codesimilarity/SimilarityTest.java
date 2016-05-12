@@ -36,8 +36,11 @@ public class SimilarityTest {
 	 * hardcoded paths with real data that are not included in repository (for
 	 * obvious reasons)
 	 */
-	private static final String REAL_DATA_PATH = "C:\\Users\\Urmas Hoogma\\Desktop\\treenode-res\\";
-	private static final String REAL_DATA_PATH_VER2 = "C:\\Users\\Urmas Hoogma\\Desktop\\treenode-2-res\\";
+	private static final String MAIN_FOLDER = "C:\\Users\\Urmas Hoogma\\Desktop\\data\\";
+	private static final String REAL_DATA_PATH = "C:\\Users\\Urmas Hoogma\\Desktop\\data\\treenode-res\\";
+	private static final String REAL_DATA_PATH_VER2 = "C:\\Users\\Urmas Hoogma\\Desktop\\data\\treenode-2-res\\";
+	private static final String REAL_DATA_PATH_VER3 = "C:\\Users\\Urmas Hoogma\\Desktop\\data\\GraphTask-res\\";
+	private static final String REAL_DATA_PATH_VER4 = "C:\\Users\\Urmas Hoogma\\Desktop\\data\\Puzzle-res\\";
 
 	private static Map<Pair, Double> comparisonResults = new HashMap<Pair, Double>();
 
@@ -49,6 +52,7 @@ public class SimilarityTest {
 		// test1();
 		// test2();
 		test3();
+		// emptyTest();
 	}
 
 	/**
@@ -56,13 +60,14 @@ public class SimilarityTest {
 	 * */
 	private static void test3() {
 		long start = System.currentTimeMillis();
-		int ngramsize = 5;
-		int windowsize = 26;
+		int ngramsize = 13;
+		int windowsize = 27;
 		double similarityThreshold = 0;
 		int modulus = 1;
-		SimilarityRunnerAdvanced sim = new SimilarityRunnerAdvanced("TreeNode.java",
-				ngramsize, windowsize, similarityThreshold, modulus);
-		String csvResult = sim.run(REAL_DATA_PATH_VER2);
+		SimilarityRunnerAdvanced sim = new SimilarityRunnerAdvanced(
+				"GraphTask.java", ngramsize, windowsize, similarityThreshold,
+				modulus);
+		String csvResult = sim.run(REAL_DATA_PATH_VER3);
 		try (PrintWriter out = new PrintWriter(
 				"C:\\Users\\Urmas Hoogma\\Desktop\\result.csv")) {
 			out.println(csvResult);
@@ -87,9 +92,31 @@ public class SimilarityTest {
 	 * Testing a combination of t and k values derived with help of bulkTest()
 	 * */
 	private static void test1() {
-		SimilarityRunner sim = new SimilarityRunner("TreeNode.java", 10, 21, 1);
+		SimilarityRunner sim = new SimilarityRunner("TreeNode.java", 13, 39, 1);
 		sim.test(REAL_DATA_PATH);
 		System.out.println(sim.difference);
+	}
+
+	/**
+	 * Testing whether an empty file gives an error
+	 * */
+	private static void emptyTest() {
+		try {
+			String q0 = new String(Files.readAllBytes(Paths.get(MAIN_FOLDER
+					+ "Empty.java")));
+
+			String q1 = new String(Files.readAllBytes(Paths.get(MAIN_FOLDER
+					+ "Empty.java")));
+
+			String qBoilerplate = new String(Files.readAllBytes(Paths
+					.get(MAIN_FOLDER + "Empty.java")));
+
+			double qTest1 = Similarity.JaccardCoefficient(q0, q1, qBoilerplate,
+					13, 39, 1);
+			System.out.println(qTest1 + " Empty");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

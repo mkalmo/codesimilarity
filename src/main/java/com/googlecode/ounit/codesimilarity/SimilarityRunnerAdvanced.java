@@ -28,8 +28,8 @@ public class SimilarityRunnerAdvanced {
 	private Map<Integer, int[]> convertedHashes = new HashMap<Integer, int[]>();
 	private Map<Pair, ValueObject> comparisonResults = new HashMap<Pair, ValueObject>();
 
-	public SimilarityRunnerAdvanced(String filename, int ngramsize, int windowsize,
-			double similarityThreshold, int modulus) {
+	public SimilarityRunnerAdvanced(String filename, int ngramsize,
+			int windowsize, double similarityThreshold, int modulus) {
 		this.filename = filename;
 		this.ngramSize = ngramsize;
 		this.windowSize = windowsize;
@@ -111,15 +111,32 @@ public class SimilarityRunnerAdvanced {
 			int student2 = attemptToStudent.get(attempt2);
 			if (student1 != student2
 					&& entry.getValue().getLargestSimilarityResult() > similarityThreshold) {
-				sb.append(comparisonNumber + "\t" + student1 + "\t"
-						+ entry.getKey().getFirst() + "\t" + student2 + "\t"
-						+ entry.getKey().getSecond() + "\t"
-						+ entry.getValue().getLargestSimilarityResult() + "\n");
-				sb.append(comparisonNumber + "\t" + student2 + "\t"
-						+ entry.getKey().getSecond() + "\t" + student1 + "\t"
-						+ entry.getKey().getFirst() + "\t"
-						+ entry.getValue().getSmallestSimilarityResult()
-						+ "\n\n");
+				sb.append(comparisonNumber);
+				sb.append("\t");
+				sb.append(student1);
+				sb.append("\t");
+				sb.append(entry.getKey().getFirst());
+				sb.append("\t");
+				sb.append(student2);
+				sb.append("\t");
+				sb.append(entry.getKey().getSecond());
+				sb.append("\t");
+				sb.append(entry.getValue().getLargestSimilarityResult());
+				sb.append("\n");
+
+				sb.append(comparisonNumber);
+				sb.append("\t");
+				sb.append(student2);
+				sb.append("\t");
+				sb.append(entry.getKey().getSecond());
+				sb.append("\t");
+				sb.append(student1);
+				sb.append("\t");
+				sb.append(entry.getKey().getFirst());
+				sb.append("\t");
+				sb.append(entry.getValue().getLargestSimilarityResult());
+				sb.append("\n\n");
+
 				comparisonNumber++;
 			}
 		}
